@@ -1,8 +1,7 @@
-import React from 'react';
+import React from 'react'
 import Autocomplete from 'react-autocomplete'
-import './App.css';
 
-class App extends React.Component {
+class SearchTwo extends React.Component {
   constructor(props) {
     super(props)
 
@@ -20,45 +19,26 @@ class App extends React.Component {
 
   async updateNow(value) {
     this.setState({value: value})
-    const exclude = this.state.professionsSelected.map(p => p.id)
-    const response = await fetch(`http://localhost:3000/professions?name=${value}&exclude=${exclude}`)
-    const professions = (await response.json()).professions
-    const a = professions.map((p) => {
-      return {
-        id: p._source.id,
-        label: p._source.name
-      }
-    })
-
-    this.setState({professions: a})
-  }
-
-  async updateResults() {
-    const prof = this.state.professionsSelected.map(p => p.id)
-    const response = await fetch(`http://localhost:3000/users?professions=${prof}`)
+    const response = await fetch(`http://localhost:3000/users2?query=${value}`)
     const responseJson = await response.json()
     const users = responseJson.users
-    const aggs = responseJson.aggs
 
     this.setState({
       results: users,
-      aggs: aggs
+      // aggs: aggs
     })
   }
 
+  async updateResults() {
+    
+  }
+
   selectProfession(item) {
-    this.setState({
-      value: '',
-      professions: [],
-      professionsSelected: this.state.professionsSelected.concat(item),
-    }, this.updateResults)
+    
   }
 
   removeProfession(id, e) {
-    const professionsSelected = this.state.professionsSelected.filter((p) => p.id !== id)
-    this.setState({
-      professionsSelected: professionsSelected
-    }, this.updateResults)
+    
   }
   
   render() {
@@ -122,4 +102,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default SearchTwo;
