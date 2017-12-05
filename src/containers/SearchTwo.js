@@ -18,34 +18,46 @@ class SearchTwo extends React.Component {
   }
 
   async updateNow(value) {
-    this.setState({value: value})
-    const response = await fetch(`http://localhost:3000/users2?query=${value}`)
-    const responseJson = await response.json()
-    const users = responseJson.users
-
-    this.setState({
-      results: users,
-      // aggs: aggs
-    })
+    this.setState({value: value}, this.updateResults)
   }
 
   async updateResults() {
-    
+    const value = this.state.value
+    const prof = this.state.professionsSelected.map(p => p.id)
+    const response = await fetch(`http://localhost:3000/users2?query=${value}&professions=${prof}`)
+    const responseJson = await response.json()
+    const users = responseJson.users
+    const aggs = responseJson.aggs
+
+    this.setState({
+      results: users,
+      aggs: aggs
+    })
   }
 
   selectProfession(item) {
     
   }
 
-  removeProfession(id, e) {
-    
+  addProfession(id) {
+    const professionsSelected = this.state.professionsSelected
+    this.setState({
+      professionsSelected: professionsSelected.concat([id])
+    }, this.updateResults)
+  }
+
+  removeProfession(id) {
+    const professionsSelected = this.state.professionsSelected.filter((p) => p.id !== id)
+    this.setState({
+      professionsSelected: professionsSelected
+    }, this.updateResults)
   }
   
   render() {
     const professionsSelected = this.state.professionsSelected.map(
       (i) => {
         return (
-          <a key={i.id} className='ui label'>{i.label}<i key={i.id} onClick={e => this.removeProfession(i.id, e)} className='delete icon'/></a>
+          <a key={i.id} className='ui label'>{i.label}<i key={i.id} onClick={e => this.removeProfession(i.id)} className='delete icon'/></a>
         )
       }
     )
@@ -63,8 +75,9 @@ class SearchTwo extends React.Component {
 
     const aggs = this.state.aggs.map(
       agg => {
+        const i = { id: agg[0], label: agg[1]}
         return (
-          <p>{agg}</p>
+          <div><a key={i.id} className='ui label'><i key={i.id} onClick={e => this.addProfession(i)} className='add icon'/>{i.label}</a></div>
         )
       }
     )

@@ -53,7 +53,14 @@ class SearchOne extends React.Component {
     }, this.updateResults)
   }
 
-  removeProfession(id, e) {
+  addProfession(id) {
+    const professionsSelected = this.state.professionsSelected
+    this.setState({
+      professionsSelected: professionsSelected.concat([id])
+    }, this.updateResults)
+  }
+
+  removeProfession(id) {
     const professionsSelected = this.state.professionsSelected.filter((p) => p.id !== id)
     this.setState({
       professionsSelected: professionsSelected
@@ -64,7 +71,7 @@ class SearchOne extends React.Component {
     const professionsSelected = this.state.professionsSelected.map(
       (i) => {
         return (
-          <a key={i.id} className='ui label'>{i.label}<i key={i.id} onClick={e => this.removeProfession(i.id, e)} className='delete icon'/></a>
+          <a key={i.id} className='ui label'>{i.label}<i key={i.id} onClick={e => this.removeProfession(i.id)} className='delete icon'/></a>
         )
       }
     )
@@ -82,8 +89,9 @@ class SearchOne extends React.Component {
 
     const aggs = this.state.aggs.map(
       agg => {
+        const i = { id: agg[0], label: agg[1]}
         return (
-          <p>{agg}</p>
+          <div><a key={i.id} className='ui label'><i key={i.id} onClick={e => this.addProfession(i)} className='add icon'/>{i.label}</a></div>
         )
       }
     )
