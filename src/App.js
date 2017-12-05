@@ -11,6 +11,7 @@ class App extends React.Component {
       professions: [],
       professionsSelected: [],
       results: [],
+      aggs: [],
     }
   }
 
@@ -35,8 +36,14 @@ class App extends React.Component {
   async updateResults() {
     const prof = this.state.professionsSelected.map(p => p.id)
     const response = await fetch(`http://localhost:3000/users?professions=${prof}`)
-    const users = (await response.json()).users
-    this.setState({results: users})
+    const responseJson = await response.json()
+    const users = responseJson.users
+    const aggs = responseJson.aggs
+
+    this.setState({
+      results: users,
+      aggs: aggs
+    })
   }
 
   selectProfession(item) {
@@ -67,9 +74,17 @@ class App extends React.Component {
       (u) => {
         return (
           <p>
-            <b>{u.firstName} {u.lastName}</b><br/>
+            <b>{u.firstName} {u.lastName}</b> - ({u.score})<br/>
             {u.professions.join(', ')}<br/>
           </p>
+        )
+      }
+    )
+
+    const aggs = this.state.aggs.map(
+      agg => {
+        return (
+          <p>{agg}</p>
         )
       }
     )
@@ -93,6 +108,8 @@ class App extends React.Component {
           />
 
           <div>{professionsSelected}</div>
+
+          <div>{aggs}</div>
         </div>
 
         <div className='eight wide column'>
