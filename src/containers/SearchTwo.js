@@ -100,8 +100,9 @@ class SearchTwo extends React.Component {
             onSelect={(v, item) => this.selectProfession(item)}
           />
 
-          <div>{professionsSelected}</div>
+          <p>{professionsSelected}</p>
 
+          <p>Filter down</p>
           <div>{aggs}</div>
         </div>
 
