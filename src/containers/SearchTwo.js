@@ -11,6 +11,7 @@ class SearchTwo extends React.Component {
       professionsSelected: [],
       results: [],
       aggs: [],
+      related: [],
     }
   }
 
@@ -26,12 +27,11 @@ class SearchTwo extends React.Component {
     const prof = this.state.professionsSelected.map(p => p.id)
     const response = await fetch(`http://localhost:3000/users2?query=${value}&professions=${prof}`)
     const responseJson = await response.json()
-    const users = responseJson.users
-    const aggs = responseJson.aggs
 
     this.setState({
-      results: users,
-      aggs: aggs
+      results: responseJson.users,
+      aggs: responseJson.aggs,
+      related: responseJson.related,
     })
   }
 
@@ -82,6 +82,15 @@ class SearchTwo extends React.Component {
       }
     )
 
+    const related = this.state.related.map(
+      prof => {
+        const i = { id: prof.id, label: prof.name}
+        return (
+          <div><a key={i.id} className='ui label'><i key={i.id} onClick={e => this.addProfession(i)} className='add icon'/>{i.label}</a></div>
+        )
+      }
+    )
+
     return (
       <div className="App ui grid container">
         <div className='four wide column'>
@@ -104,6 +113,9 @@ class SearchTwo extends React.Component {
 
           <p>Filter down</p>
           <div>{aggs}</div>
+
+          <p>Related</p>
+          <div>{related}</div>
         </div>
 
         <div className='eight wide column'>
