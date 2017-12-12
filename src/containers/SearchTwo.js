@@ -1,5 +1,6 @@
 import React from 'react'
 import Autocomplete from 'react-autocomplete'
+import UserResult from '../components/UserResult'
 
 class SearchTwo extends React.Component {
   constructor(props) {
@@ -62,16 +63,7 @@ class SearchTwo extends React.Component {
       }
     )
 
-    const results = this.state.results.map(
-      (u) => {
-        return (
-          <p>
-            <b>{u.firstName} {u.lastName}</b> - ({u.score})<br/>
-            {u.professions.join(', ')}<br/>
-          </p>
-        )
-      }
-    )
+    const results = this.state.results.map(user => <UserResult user={user} />)
 
     const aggs = this.state.aggs.map(
       agg => {
@@ -111,16 +103,18 @@ class SearchTwo extends React.Component {
 
           <p>{professionsSelected}</p>
 
-          <p>Filter down</p>
+          <p>Filter professions</p>
           <div>{aggs}</div>
 
-          <p>Related</p>
+          <p>Related professions</p>
           <div>{related}</div>
         </div>
 
-        <div className='eight wide column'>
+        <div className='ten wide column'>
           <h3>Results</h3>
-          {results}
+          <div className='ui divided items'>
+            {results}
+          </div>
         </div>
         
       </div>
