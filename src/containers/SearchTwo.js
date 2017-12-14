@@ -2,7 +2,7 @@ import React from 'react'
 import Autocomplete from 'react-autocomplete'
 import UserResult from '../components/UserResult'
 
-class SearchTwo extends React.Component {
+export default class SearchTwo extends React.Component {
   constructor(props) {
     super(props)
 
@@ -118,8 +118,6 @@ class SearchTwo extends React.Component {
         </div>
         
       </div>
-    );
+    )
   }
 }
-
-export default SearchTwo;
