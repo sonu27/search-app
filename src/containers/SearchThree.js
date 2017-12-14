@@ -11,8 +11,13 @@ export default class SearchThree extends React.Component {
       skillsAutocomplete: [],
       skillsAutocompleteValue: '',
       skillsSelected: [],
+      professionsAutocomplete: [],
+      professionsAutocompleteValue: '',
+      professionsSelected: [],
       aggregations: {
         skills: [],
+        professions: [],
+        locations: [],
       },
     }
   }
@@ -35,10 +40,10 @@ export default class SearchThree extends React.Component {
     const response = await fetch(`http://localhost:3000/skills?name=${value}&exclude=${exclude}`)
     const skills = (await response.json()).skills
     
-    const skillsAutocomplete = skills.map((p) => {
+    const skillsAutocomplete = skills.map((i) => {
       return {
-        id: p._source.id,
-        name: p._source.name
+        id: i._source.id,
+        name: i._source.name
       }
     })
 
@@ -66,9 +71,47 @@ export default class SearchThree extends React.Component {
     }, this.updateResults)
   }
 
+  async updateProfessionsAutocomplete(value) {
+    this.setState({professionsAutocompleteValue: value})
+    const exclude = this.state.professionsSelected.join()
+    const response = await fetch(`http://localhost:3000/professions?name=${value}&exclude=${exclude}`)
+    const professions = (await response.json()).professions
+    
+    const professionsAutocomplete = professions.map((i) => {
+      return {
+        id: i._source.id,
+        name: i._source.name
+      }
+    })
+
+    this.setState({professionsAutocomplete: professionsAutocomplete})
+  }
+
+  selectProfession(profession) {
+    this.setState({
+      professionsAutocompleteValue: '',
+      professionsAutocomplete: [],
+    }, this.addProfession(profession))
+  }
+
+  addProfession(profession) {
+    if (!this.state.professionsSelected.includes(profession)) {
+      this.setState({
+        professionsSelected: this.state.professionsSelected.concat(profession),
+      }, this.updateResults)
+    }
+  }
+
+  removeProfession(profession) {
+    this.setState({
+      professionsSelected: this.state.professionsSelected.filter((i) => i !== profession)
+    }, this.updateResults)
+  }
+
   async updateResults() {
     const data = {
-      skills: this.state.skillsSelected
+      skills: this.state.skillsSelected,
+      professions: this.state.professionsSelected,
     }
     const response = await fetch(`http://localhost:3000/users3`, {
       method: 'POST',
@@ -109,6 +152,36 @@ export default class SearchThree extends React.Component {
       }
     )
 
+    const professionsSelected = this.state.professionsSelected.map(
+      i => {
+        return (
+          <div>
+            <a key={i} className='ui label'>{i}<i key={i} onClick={e => this.removeProfession(i)} className='delete icon'/></a><br/>
+          </div>
+        )
+      }
+    )
+
+    const professionsAgg = this.state.aggregations.professions.map(
+      i => {
+        return (
+          <div>
+            <a key={i} className='ui label'><i key={i} onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
+          </div>
+        )
+      }
+    )
+
+    // const locationsAgg = this.state.aggregations.locations.map(
+    //   i => {
+    //     return (
+    //       <div>
+    //         <a key={i} className='ui label'><i key={i} onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
+    //       </div>
+    //     )
+    //   }
+    // )
+
     const results = this.state.results.map(user => <UserResult user={user} />)
 
     return (
@@ -125,10 +198,22 @@ export default class SearchThree extends React.Component {
             onChange={e => this.updateSkillsAutocomplete(e.target.value)}
             onSelect={(v) => this.selectSkill(v)}
           />
-
           {skillsSelected}
-
           {skillsAgg}
+
+          <hr/>
+
+          <h3>Professions</h3>
+          <Autocomplete
+            getItemValue={item => item.name}
+            items={this.state.professionsAutocomplete}
+            renderItem={this.renderAutocompleteItem}
+            value={this.state.professionsAutocompleteValue}
+            onChange={e => this.updateProfessionsAutocomplete(e.target.value)}
+            onSelect={(v) => this.selectProfession(v)}
+          />
+          {professionsSelected}
+          {professionsAgg}
         </div>
 
         <div className='ten wide column'>
