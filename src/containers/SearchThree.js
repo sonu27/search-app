@@ -151,8 +151,8 @@ export default class SearchThree extends React.Component {
     const skillsSelected = this.state.skillsSelected.map(
       i => {
         return (
-          <div>
-            <a key={i} className='ui label'>{i}<i key={i} onClick={e => this.removeSkill(i)} className='delete icon'/></a><br/>
+          <div key={i}>
+            <a className='ui label'>{i}<i onClick={e => this.removeSkill(i)} className='delete icon'/></a><br/>
           </div>
         )
       }
@@ -162,7 +162,7 @@ export default class SearchThree extends React.Component {
       i => {
         return (
           <div key={i}>
-            <a className='ui label'><i key={i} onClick={e => this.addSkill(i)} className='add icon'/>{i}</a>
+            <a className='ui label'><i onClick={e => this.addSkill(i)} className='add icon'/>{i}</a>
           </div>
         )
       }
@@ -172,7 +172,7 @@ export default class SearchThree extends React.Component {
       i => {
         return (
           <div key={i}>
-            <a className='ui label'>{i}<i key={i} onClick={e => this.removeProfession(i)} className='delete icon'/></a><br/>
+            <a className='ui label'>{i}<i onClick={e => this.removeProfession(i)} className='delete icon'/></a><br/>
           </div>
         )
       }
@@ -182,7 +182,7 @@ export default class SearchThree extends React.Component {
       i => {
         return (
           <div key={i}>
-            <a className='ui label'><i key={i} onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
+            <a className='ui label'><i onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
           </div>
         )
       }
@@ -192,7 +192,7 @@ export default class SearchThree extends React.Component {
     //   i => {
     //     return (
     //       <div key={i}>
-    //         <a className='ui label'><i key={i} onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
+    //         <a className='ui label'><i onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
     //       </div>
     //     )
     //   }
