@@ -20,6 +20,9 @@ export default class SearchThree extends React.Component {
         professions: [],
         locations: [],
       },
+      related: {
+        skills: [],
+      },
     }
   }
 
@@ -138,12 +141,36 @@ export default class SearchThree extends React.Component {
       body: JSON.stringify(data)
     })
     const responseJson = await response.json()
-    const users = responseJson.users
-    const aggregations = responseJson.aggregations
 
     this.setState({
-      results: users,
-      aggregations: aggregations
+      results: responseJson.users,
+      aggregations: responseJson.aggregations,
+    }, this.updateRelated)
+  }
+
+  async updateRelated() {
+    if (this.state.skillsSelected.length === 0) {
+      return
+    }
+
+    const data = {
+      skills: this.state.skillsSelected,
+    }
+    const response = await fetch(`http://localhost:3000/skills/related`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    const responseJson = await response.json()
+    const relatedSkills = responseJson.relatedSkills
+      .filter(i => !this.state.skillsSelected.includes(i.name))
+      .map(i => i.name)
+
+    this.setState({
+      related: { skills: relatedSkills }
     })
   }
 
@@ -153,6 +180,16 @@ export default class SearchThree extends React.Component {
         return (
           <div key={i}>
             <a className='ui label'>{i}<i onClick={e => this.removeSkill(i)} className='delete icon'/></a><br/>
+          </div>
+        )
+      }
+    )
+
+    const relatedSkills = this.state.related.skills.map(
+      i => {
+        return (
+          <div key={i}>
+            <a className='ui label'><i onClick={e => this.addSkill(i)} className='add icon'/>{i}</a>
           </div>
         )
       }
@@ -228,6 +265,9 @@ export default class SearchThree extends React.Component {
           />
           {skillsSelected}
           {skillsAgg}
+
+          <h4>Related Skills</h4>
+          {relatedSkills}
 
           <hr/>
 
