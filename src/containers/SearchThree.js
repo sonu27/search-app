@@ -14,6 +14,7 @@ export default class SearchThree extends React.Component {
       professionsAutocomplete: [],
       professionsAutocompleteValue: '',
       professionsSelected: [],
+      levelsSelected: [],
       aggregations: {
         skills: [],
         professions: [],
@@ -108,10 +109,25 @@ export default class SearchThree extends React.Component {
     }, this.updateResults)
   }
 
+  handleLevelChange(e) {
+    const target = e.target
+    const level = target.value
+    if (target.checked) {
+      this.setState({
+        levelsSelected: this.state.levelsSelected.concat(level),
+      }, this.updateResults)
+    } else {
+      this.setState({
+        levelsSelected: this.state.levelsSelected.filter((i) => i !== level)
+      }, this.updateResults)
+    }
+  }
+
   async updateResults() {
     const data = {
       skills: this.state.skillsSelected,
       professions: this.state.professionsSelected,
+      levels: this.state.levelsSelected,
     }
     const response = await fetch(`http://localhost:3000/users3`, {
       method: 'POST',
@@ -182,7 +198,19 @@ export default class SearchThree extends React.Component {
     //   }
     // )
 
-    const results = this.state.results.map(user => <UserResult user={user} />)
+    const allLevels = ['Unknown', 'Junior', 'Mid-level', 'Senior']
+
+    const levels = allLevels.map((v, i) => {
+      return (
+        <div key={i}>
+          <label>
+            <input type='checkbox' value={i} onChange={this.handleLevelChange.bind(this)}/> {v}
+          </label>
+        </div>
+      )
+    })
+
+    const results = this.state.results.map((user, i) => <UserResult key={i} user={user} />)
 
     return (
       <div className="App ui grid container">
@@ -214,6 +242,11 @@ export default class SearchThree extends React.Component {
           />
           {professionsSelected}
           {professionsAgg}
+
+          <hr/>
+
+          <h3>Levels</h3>
+          {levels}
         </div>
 
         <div className='ten wide column'>
