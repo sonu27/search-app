@@ -145,8 +145,8 @@ export default class SearchThree extends React.Component {
     const skillsAgg = this.state.aggregations.skills.map(
       i => {
         return (
-          <div>
-            <a key={i} className='ui label'><i key={i} onClick={e => this.addSkill(i)} className='add icon'/>{i}</a>
+          <div key={i}>
+            <a className='ui label'><i key={i} onClick={e => this.addSkill(i)} className='add icon'/>{i}</a>
           </div>
         )
       }
@@ -155,8 +155,8 @@ export default class SearchThree extends React.Component {
     const professionsSelected = this.state.professionsSelected.map(
       i => {
         return (
-          <div>
-            <a key={i} className='ui label'>{i}<i key={i} onClick={e => this.removeProfession(i)} className='delete icon'/></a><br/>
+          <div key={i}>
+            <a className='ui label'>{i}<i key={i} onClick={e => this.removeProfession(i)} className='delete icon'/></a><br/>
           </div>
         )
       }
@@ -165,8 +165,8 @@ export default class SearchThree extends React.Component {
     const professionsAgg = this.state.aggregations.professions.map(
       i => {
         return (
-          <div>
-            <a key={i} className='ui label'><i key={i} onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
+          <div key={i}>
+            <a className='ui label'><i key={i} onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
           </div>
         )
       }
@@ -175,8 +175,8 @@ export default class SearchThree extends React.Component {
     // const locationsAgg = this.state.aggregations.locations.map(
     //   i => {
     //     return (
-    //       <div>
-    //         <a key={i} className='ui label'><i key={i} onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
+    //       <div key={i}>
+    //         <a className='ui label'><i key={i} onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
     //       </div>
     //     )
     //   }

@@ -2,7 +2,6 @@ import React from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Link,
   NavLink
 } from 'react-router-dom'
 import SearchOne from './SearchOne'
