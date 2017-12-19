@@ -1,5 +1,6 @@
 import React from 'react'
 import Autocomplete from 'react-autocomplete'
+import Pagination from '../components/Pagination'
 import UserResult from '../components/UserResult'
 
 export default class SearchThree extends React.Component {
@@ -23,6 +24,7 @@ export default class SearchThree extends React.Component {
       related: {
         skills: [],
       },
+      currentPage: 1,
     }
   }
 
@@ -132,7 +134,7 @@ export default class SearchThree extends React.Component {
       professions: this.state.professionsSelected,
       levels: this.state.levelsSelected,
     }
-    const response = await fetch(`http://localhost:3000/users3`, {
+    const response = await fetch(`http://localhost:3000/users3?page=${this.state.currentPage}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json, text/plain, */*',
@@ -172,6 +174,18 @@ export default class SearchThree extends React.Component {
     this.setState({
       related: { skills: relatedSkills }
     })
+  }
+
+  handlePageClick(e) {
+    const page = parseInt(e.target.attributes.value.value, 10)
+
+    if (page > 0) {
+      this.setState({
+        currentPage: page
+      }, this.updateResults)
+
+      window.scrollTo(0, 0)
+    }
   }
 
   render() {
@@ -290,10 +304,18 @@ export default class SearchThree extends React.Component {
         </div>
 
         <div className='ten wide column'>
+          <Pagination
+            currentPage={this.state.currentPage}
+            handleClick={this.handlePageClick.bind(this)}
+          />
           <h3>Results</h3>
           <div className='ui divided items'>
             {results}
           </div>
+          <Pagination
+            currentPage={this.state.currentPage}
+            handleClick={this.handlePageClick.bind(this)}
+          />
         </div>
         
       </div>
