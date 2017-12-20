@@ -68,13 +68,15 @@ export default class SearchThree extends React.Component {
     if (!this.state.skillsSelected.includes(skill)) {
       this.setState({
         skillsSelected: this.state.skillsSelected.concat(skill),
+        currentPage: 1,
       }, this.updateResults)
     }
   }
 
   removeSkill(skill) {
     this.setState({
-      skillsSelected: this.state.skillsSelected.filter((i) => i !== skill)
+      skillsSelected: this.state.skillsSelected.filter((i) => i !== skill),
+      currentPage: 1,
     }, this.updateResults)
   }
 
@@ -105,13 +107,15 @@ export default class SearchThree extends React.Component {
     if (!this.state.professionsSelected.includes(profession)) {
       this.setState({
         professionsSelected: this.state.professionsSelected.concat(profession),
+        currentPage: 1,
       }, this.updateResults)
     }
   }
 
   removeProfession(profession) {
     this.setState({
-      professionsSelected: this.state.professionsSelected.filter((i) => i !== profession)
+      professionsSelected: this.state.professionsSelected.filter((i) => i !== profession),
+      currentPage: 1,
     }, this.updateResults)
   }
 
@@ -121,10 +125,12 @@ export default class SearchThree extends React.Component {
     if (target.checked) {
       this.setState({
         levelsSelected: this.state.levelsSelected.concat(level),
+        currentPage: 1,
       }, this.updateResults)
     } else {
       this.setState({
-        levelsSelected: this.state.levelsSelected.filter((i) => i !== level)
+        levelsSelected: this.state.levelsSelected.filter((i) => i !== level),
+        currentPage: 1,
       }, this.updateResults)
     }
   }
