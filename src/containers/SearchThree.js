@@ -9,6 +9,7 @@ export default class SearchThree extends React.Component {
 
     this.state = {
       results: [],
+      totalResults: 0,
       skillsAutocomplete: [],
       skillsAutocompleteValue: '',
       skillsSelected: [],
@@ -146,6 +147,7 @@ export default class SearchThree extends React.Component {
 
     this.setState({
       results: responseJson.users,
+      totalResults: responseJson.total,
       aggregations: responseJson.aggregations,
     }, this.updateRelated)
   }
@@ -308,7 +310,7 @@ export default class SearchThree extends React.Component {
             currentPage={this.state.currentPage}
             handleClick={this.handlePageClick.bind(this)}
           />
-          <h3>Results</h3>
+          <h3>Results ({(this.state.currentPage * 50) - 49} - {this.state.currentPage * 50} of {this.state.totalResults})</h3>
           <div className='ui divided items'>
             {results}
           </div>
