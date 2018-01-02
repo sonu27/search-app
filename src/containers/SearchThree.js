@@ -3,7 +3,7 @@ import Autocomplete from 'react-autocomplete'
 import Pagination from '../components/Pagination'
 import UserResult from '../components/UserResult'
 
-export default class SearchThree extends React.Component {
+export default class extends React.Component {
   constructor(props) {
     super(props)
 

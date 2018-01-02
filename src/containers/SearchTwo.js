@@ -2,7 +2,7 @@ import React from 'react'
 import Autocomplete from 'react-autocomplete'
 import UserResult from '../components/UserResult'
 
-export default class SearchTwo extends React.Component {
+export default class extends React.Component {
   constructor(props) {
     super(props)
 
