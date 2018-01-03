@@ -46,7 +46,7 @@ export default class extends React.Component {
     const exclude = this.state.skillsSelected.join()
     const response = await fetch(`http://localhost:3000/skills?name=${value}&exclude=${exclude}`)
     const skills = (await response.json()).skills
-    
+
     const skillsAutocomplete = skills.map((i) => {
       return {
         id: i._source.id,
@@ -85,7 +85,7 @@ export default class extends React.Component {
     const exclude = this.state.professionsSelected.join()
     const response = await fetch(`http://localhost:3000/professions?name=${value}&exclude=${exclude}`)
     const professions = (await response.json()).professions
-    
+
     const professionsAutocomplete = professions.map((i) => {
       return {
         id: i._source.id,
@@ -275,7 +275,7 @@ export default class extends React.Component {
       <div className="App ui grid container">
         <div className='four wide column'>
           <h1>Search Users</h1>
-        
+
           <h3>Skills</h3>
           <Autocomplete
             getItemValue={item => item.name}
@@ -325,7 +325,7 @@ export default class extends React.Component {
             handleClick={this.handlePageClick.bind(this)}
           />
         </div>
-        
+
       </div>
     )
   }

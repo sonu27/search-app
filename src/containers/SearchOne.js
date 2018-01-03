@@ -21,7 +21,7 @@ export default class extends React.Component {
   async updateNow(value) {
     this.setState({value: value})
     const exclude = this.state.professionsSelected.map(p => p.id)
-    const response = await fetch(`http://localhost:3000/professions?name=${value}&exclude=${exclude}`)
+    const response = await fetch(`http://localhost:3000/professions2?name=${value}&exclude=${exclude}`)
     const professions = (await response.json()).professions
     const a = professions.map((p) => {
       return {
@@ -67,7 +67,7 @@ export default class extends React.Component {
       professionsSelected: professionsSelected
     }, this.updateResults)
   }
-  
+
   render() {
     const professionsSelected = this.state.professionsSelected.map(
       (i) => {
@@ -92,7 +92,7 @@ export default class extends React.Component {
       <div className="App ui grid container">
         <div className='four wide column'>
           <h1>Search Users</h1>
-        
+
           <Autocomplete
             getItemValue={(item) => item.label}
             items={this.state.professions}
@@ -117,7 +117,7 @@ export default class extends React.Component {
             {results}
           </div>
         </div>
-        
+
       </div>
     )
   }
