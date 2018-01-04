@@ -14,7 +14,7 @@ const getLevelName = id => {
 }
 
 const getProfileImageUrl = (user) => {
-  if (user.profileImage === 'NULL') {
+  if (user.profileImage === 'null') {
     return 'https://semantic-ui.com/images/avatar/large/jenny.jpg'
   } else {
     return `https://images3.the-dots.com/${user.profileImage}?p=profileImage`
