@@ -3,6 +3,8 @@ import Autocomplete from 'react-autocomplete'
 import Pagination from '../components/Pagination'
 import UserResult from '../components/UserResult'
 
+const searchApiUrl = process.env.REACT_APP_SEARCH_API_URL
+
 export default class extends React.Component {
   constructor(props) {
     super(props)
@@ -44,7 +46,7 @@ export default class extends React.Component {
   async updateSkillsAutocomplete(value) {
     this.setState({skillsAutocompleteValue: value})
     const exclude = this.state.skillsSelected.join()
-    const response = await fetch(`http://localhost:3000/skills?name=${value}&exclude=${exclude}`)
+    const response = await fetch(`${searchApiUrl}/skills?name=${value}&exclude=${exclude}`)
     const skills = (await response.json()).skills
 
     const skillsAutocomplete = skills.map((i) => {
@@ -83,7 +85,7 @@ export default class extends React.Component {
   async updateProfessionsAutocomplete(value) {
     this.setState({professionsAutocompleteValue: value})
     const exclude = this.state.professionsSelected.join()
-    const response = await fetch(`http://localhost:3000/professions?name=${value}&exclude=${exclude}`)
+    const response = await fetch(`${searchApiUrl}/professions?name=${value}&exclude=${exclude}`)
     const professions = (await response.json()).professions
 
     const professionsAutocomplete = professions.map((i) => {
@@ -141,7 +143,7 @@ export default class extends React.Component {
       professions: this.state.professionsSelected,
       levels: this.state.levelsSelected,
     }
-    const response = await fetch(`http://localhost:3000/users3?page=${this.state.currentPage}`, {
+    const response = await fetch(`${searchApiUrl}/users3?page=${this.state.currentPage}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json, text/plain, */*',
@@ -166,7 +168,7 @@ export default class extends React.Component {
     const data = {
       skills: this.state.skillsSelected,
     }
-    const response = await fetch(`http://localhost:3000/skills/related`, {
+    const response = await fetch(`${searchApiUrl}/skills/related`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json, text/plain, */*',

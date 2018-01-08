@@ -2,6 +2,8 @@ import React from 'react'
 import Autocomplete from 'react-autocomplete'
 import UserResult from '../components/UserResult'
 
+const searchApiUrl = process.env.REACT_APP_SEARCH_API_URL
+
 export default class extends React.Component {
   constructor(props) {
     super(props)
@@ -26,7 +28,7 @@ export default class extends React.Component {
   async updateResults() {
     const value = this.state.value
     const prof = this.state.professionsSelected.map(p => p.id)
-    const response = await fetch(`http://localhost:3000/users2?query=${value}&professions=${prof}`)
+    const response = await fetch(`${searchApiUrl}/users2?query=${value}&professions=${prof}`)
     const responseJson = await response.json()
 
     this.setState({
@@ -37,7 +39,7 @@ export default class extends React.Component {
   }
 
   selectProfession(item) {
-    
+
   }
 
   addProfession(id) {
@@ -53,7 +55,7 @@ export default class extends React.Component {
       professionsSelected: professionsSelected
     }, this.updateResults)
   }
-  
+
   render() {
     const professionsSelected = this.state.professionsSelected.map(
       (i) => {
@@ -87,7 +89,7 @@ export default class extends React.Component {
       <div className="App ui grid container">
         <div className='four wide column'>
           <h1>Search Users</h1>
-        
+
           <Autocomplete
             getItemValue={(item) => item.label}
             items={this.state.professions}
@@ -116,7 +118,7 @@ export default class extends React.Component {
             {results}
           </div>
         </div>
-        
+
       </div>
     )
   }

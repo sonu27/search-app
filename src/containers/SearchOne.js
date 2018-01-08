@@ -2,6 +2,8 @@ import React from 'react'
 import Autocomplete from 'react-autocomplete'
 import UserResult from '../components/UserResult'
 
+const searchApiUrl = process.env.REACT_APP_SEARCH_API_URL
+
 export default class extends React.Component {
   constructor(props) {
     super(props)
@@ -21,7 +23,7 @@ export default class extends React.Component {
   async updateNow(value) {
     this.setState({value: value})
     const exclude = this.state.professionsSelected.map(p => p.id)
-    const response = await fetch(`http://localhost:3000/professions2?name=${value}&exclude=${exclude}`)
+    const response = await fetch(`${searchApiUrl}/professions2?name=${value}&exclude=${exclude}`)
     const professions = (await response.json()).professions
     const a = professions.map((p) => {
       return {
@@ -35,7 +37,7 @@ export default class extends React.Component {
 
   async updateResults() {
     const prof = this.state.professionsSelected.map(p => p.id)
-    const response = await fetch(`http://localhost:3000/users?professions=${prof}`)
+    const response = await fetch(`${searchApiUrl}/users?professions=${prof}`)
     const responseJson = await response.json()
     const users = responseJson.users
     const aggs = responseJson.aggs
