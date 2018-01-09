@@ -18,6 +18,9 @@ export default class extends React.Component {
       professionsAutocomplete: [],
       professionsAutocompleteValue: '',
       professionsSelected: [],
+      locationsAutocomplete: [],
+      locationsAutocompleteValue: '',
+      locationsSelected: [],
       levelsSelected: [],
       availabilitiesSelected: [],
       related: {
@@ -117,6 +120,44 @@ export default class extends React.Component {
     }, this.updateResults)
   }
 
+  async updateLocationsAutocomplete(value) {
+    this.setState({locationsAutocompleteValue: value})
+    const exclude = this.state.locationsSelected.join()
+    const response = await fetch(`${searchApiUrl}/locations?name=${value}&exclude=${exclude}`)
+    const locations = (await response.json()).locations
+
+    const locationsAutocomplete = locations.map((i) => {
+      return {
+        name: i.name
+      }
+    })
+
+    this.setState({locationsAutocomplete: locationsAutocomplete})
+  }
+
+  selectLocation(location) {
+    this.setState({
+      locationsAutocompleteValue: '',
+      locationsAutocomplete: [],
+    }, this.addLocation(location))
+  }
+
+  addLocation(location) {
+    if (!this.state.locationsSelected.includes(location)) {
+      this.setState({
+        locationsSelected: this.state.locationsSelected.concat(location),
+        currentPage: 1,
+      }, this.updateResults)
+    }
+  }
+
+  removeLocation(location) {
+    this.setState({
+      locationsSelected: this.state.locationsSelected.filter((i) => i !== location),
+      currentPage: 1,
+    }, this.updateResults)
+  }
+
   handleLevelChange(e) {
     const target = e.target
     const level = target.value
@@ -154,6 +195,7 @@ export default class extends React.Component {
       skills: this.state.skillsSelected,
       professions: this.state.professionsSelected,
       levels: this.state.levelsSelected,
+      locations: this.state.locationsSelected,
       availabilities: this.state.availabilitiesSelected,
     }
     const response = await fetch(`${searchApiUrl}/users4?page=${this.state.currentPage}`, {
@@ -242,6 +284,16 @@ export default class extends React.Component {
       }
     )
 
+    const locationsSelected = this.state.locationsSelected.map(
+      i => {
+        return (
+          <div key={i}>
+            <a className='ui label'>{i}<i onClick={e => this.removeLocation(i)} className='delete icon'/></a><br/>
+          </div>
+        )
+      }
+    )
+
     const allLevels = ['Unknown', 'Junior', 'Mid-level', 'Senior']
 
     const levels = allLevels.map((v, i) => {
@@ -299,6 +351,19 @@ export default class extends React.Component {
             onSelect={(v) => this.selectProfession(v)}
           />
           {professionsSelected}
+
+          <hr/>
+
+          <h3>Locations</h3>
+          <Autocomplete
+            getItemValue={item => item.name}
+            items={this.state.locationsAutocomplete}
+            renderItem={this.renderAutocompleteItem}
+            value={this.state.locationsAutocompleteValue}
+            onChange={e => this.updateLocationsAutocomplete(e.target.value)}
+            onSelect={(v) => this.selectLocation(v)}
+          />
+          {locationsSelected}
 
           <hr/>
 
