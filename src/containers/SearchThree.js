@@ -1,5 +1,6 @@
 import React from 'react'
 import Autocomplete from 'react-autocomplete'
+import Api from '../api'
 import Pagination from '../components/Pagination'
 import UserResult from '../components/UserResult'
 
@@ -24,9 +25,7 @@ export default class extends React.Component {
         professions: [],
         locations: [],
       },
-      related: {
-        skills: [],
-      },
+      relatedSkills: [],
       currentPage: 1,
     }
   }
@@ -44,19 +43,10 @@ export default class extends React.Component {
   }
 
   async updateSkillsAutocomplete(value) {
-    this.setState({skillsAutocompleteValue: value})
-    const exclude = this.state.skillsSelected.join()
-    const response = await fetch(`${searchApiUrl}/skills?name=${value}&exclude=${exclude}`)
-    const skills = (await response.json()).skills
+    const exclude = this.state.skillsSelected
+    const skills = await new Api().searchSkills(value, exclude)
 
-    const skillsAutocomplete = skills.map((i) => {
-      return {
-        id: i._source.id,
-        name: i._source.name
-      }
-    })
-
-    this.setState({skillsAutocomplete: skillsAutocomplete})
+    this.setState({ skillsAutocompleteValue: value, skillsAutocomplete: skills })
   }
 
   selectSkill(skill) {
@@ -83,19 +73,10 @@ export default class extends React.Component {
   }
 
   async updateProfessionsAutocomplete(value) {
-    this.setState({professionsAutocompleteValue: value})
-    const exclude = this.state.professionsSelected.join()
-    const response = await fetch(`${searchApiUrl}/professions?name=${value}&exclude=${exclude}`)
-    const professions = (await response.json()).professions
+    const exclude = this.state.professionsSelected
+    const professions = await new Api().searchProfessions(value, exclude)
 
-    const professionsAutocomplete = professions.map((i) => {
-      return {
-        id: i._source.id,
-        name: i._source.name
-      }
-    })
-
-    this.setState({professionsAutocomplete: professionsAutocomplete})
+    this.setState({ professionsAutocompleteValue: value, professionsAutocomplete: professions })
   }
 
   selectProfession(profession) {
@@ -143,20 +124,12 @@ export default class extends React.Component {
       professions: this.state.professionsSelected,
       levels: this.state.levelsSelected,
     }
-    const response = await fetch(`${searchApiUrl}/users3?page=${this.state.currentPage}`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-    const responseJson = await response.json()
+    const response = await new Api().postRequest(`${searchApiUrl}/users3?page=${this.state.currentPage}`, data)
 
     this.setState({
-      results: responseJson.users,
-      totalResults: responseJson.total,
-      aggregations: responseJson.aggregations,
+      results: response.users,
+      totalResults: response.total,
+      aggregations: response.aggregations,
     }, this.updateRelated)
   }
 
@@ -165,25 +138,9 @@ export default class extends React.Component {
       return
     }
 
-    const data = {
-      skills: this.state.skillsSelected,
-    }
-    const response = await fetch(`${searchApiUrl}/skills/related`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-    const responseJson = await response.json()
-    const relatedSkills = responseJson.relatedSkills
-      .filter(i => !this.state.skillsSelected.includes(i.name))
-      .map(i => i.name)
+    const relatedSkills = await new Api().getRelatedSkills(this.state.skillsSelected)
 
-    this.setState({
-      related: { skills: relatedSkills }
-    })
+    this.setState({ relatedSkills: relatedSkills })
   }
 
   handlePageClick(e) {
@@ -209,7 +166,7 @@ export default class extends React.Component {
       }
     )
 
-    const relatedSkills = this.state.related.skills.map(
+    const relatedSkills = this.state.relatedSkills.map(
       i => {
         return (
           <div key={i}>

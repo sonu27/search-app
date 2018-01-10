@@ -42,11 +42,10 @@ export default class extends React.Component {
   }
 
   async updateSkillsAutocomplete(value) {
-    this.setState({skillsAutocompleteValue: value})
     const exclude = this.state.skillsSelected
     const skills = await new Api().searchSkills(value, exclude)
 
-    this.setState({skillsAutocomplete: skills})
+    this.setState({ skillsAutocompleteValue: value, skillsAutocomplete: skills })
   }
 
   selectSkill(skill) {
@@ -73,11 +72,10 @@ export default class extends React.Component {
   }
 
   async updateProfessionsAutocomplete(value) {
-    this.setState({professionsAutocompleteValue: value})
     const exclude = this.state.professionsSelected
     const professions = await new Api().searchProfessions(value, exclude)
 
-    this.setState({professionsAutocomplete: professions})
+    this.setState({ professionsAutocompleteValue: value, professionsAutocomplete: professions })
   }
 
   selectProfession(profession) {
@@ -108,13 +106,9 @@ export default class extends React.Component {
     const exclude = this.state.locationsSelected
     const locations = await new Api().searchLocations(value, exclude)
 
-    const locationsAutocomplete = locations.map((i) => {
-      return {
-        name: i.name
-      }
-    })
+    const locationsAutocomplete = locations.map((i) => ({ name: i.name }))
 
-    this.setState({locationsAutocomplete: locationsAutocomplete})
+    this.setState({ locationsAutocompleteValue: value, locationsAutocomplete: locationsAutocomplete })
   }
 
   selectLocation(location) {
