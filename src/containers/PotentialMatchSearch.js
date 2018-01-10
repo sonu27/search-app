@@ -1,5 +1,6 @@
 import React from 'react'
 import Autocomplete from 'react-autocomplete'
+import Api from '../api'
 import Pagination from '../components/Pagination'
 import UserResult from '../components/UserResult'
 
@@ -23,9 +24,7 @@ export default class extends React.Component {
       locationsSelected: [],
       levelsSelected: [],
       availabilitiesSelected: [],
-      related: {
-        skills: [],
-      },
+      relatedSkills: [],
       currentPage: 1,
     }
   }
@@ -45,15 +44,7 @@ export default class extends React.Component {
   async updateSkillsAutocomplete(value) {
     this.setState({skillsAutocompleteValue: value})
     const exclude = this.state.skillsSelected
-    const response = await fetch(`${searchApiUrl}/skills`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ name: value, exclude: exclude })
-    })
-    const skills = (await response.json()).skills
+    const skills = await new Api().searchSkills(value, exclude)
 
     this.setState({skillsAutocomplete: skills})
   }
@@ -84,15 +75,7 @@ export default class extends React.Component {
   async updateProfessionsAutocomplete(value) {
     this.setState({professionsAutocompleteValue: value})
     const exclude = this.state.professionsSelected
-    const response = await fetch(`${searchApiUrl}/professions`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ name: value, exclude: exclude })
-    })
-    const professions = (await response.json()).professions
+    const professions = await new Api().searchProfessions(value, exclude)
 
     this.setState({professionsAutocomplete: professions})
   }
@@ -123,15 +106,7 @@ export default class extends React.Component {
   async updateLocationsAutocomplete(value) {
     this.setState({ locationsAutocompleteValue: value })
     const exclude = this.state.locationsSelected
-    const response = await fetch(`${searchApiUrl}/locations`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ name: value, exclude: exclude })
-    })
-    const locations = (await response.json()).locations
+    const locations = await new Api().searchLocations(value, exclude)
 
     const locationsAutocomplete = locations.map((i) => {
       return {
@@ -205,19 +180,11 @@ export default class extends React.Component {
       locations: this.state.locationsSelected,
       availabilities: this.state.availabilitiesSelected,
     }
-    const response = await fetch(`${searchApiUrl}/users4?page=${this.state.currentPage}`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-    const responseJson = await response.json()
+    const response = await new Api().postRequest(`${searchApiUrl}/users4?page=${this.state.currentPage}`, data)
 
     this.setState({
-      results: responseJson.users,
-      totalResults: responseJson.total,
+      results: response.users,
+      totalResults: response.total,
     }, this.updateRelated)
   }
 
@@ -226,25 +193,9 @@ export default class extends React.Component {
       return
     }
 
-    const data = {
-      skills: this.state.skillsSelected,
-    }
-    const response = await fetch(`${searchApiUrl}/skills/related`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-    const responseJson = await response.json()
-    const relatedSkills = responseJson.relatedSkills
-      .filter(i => !this.state.skillsSelected.includes(i.name))
-      .map(i => i.name)
+    const relatedSkills = await new Api().getRelatedSkills(this.state.skillsSelected)
 
-    this.setState({
-      related: { skills: relatedSkills }
-    })
+    this.setState({ relatedSkills: relatedSkills })
   }
 
   handlePageClick(e) {
@@ -270,7 +221,7 @@ export default class extends React.Component {
       }
     )
 
-    const relatedSkills = this.state.related.skills.map(
+    const relatedSkills = this.state.relatedSkills.map(
       i => {
         return (
           <div key={i}>
