@@ -55,14 +55,7 @@ export default class extends React.Component {
     })
     const skills = (await response.json()).skills
 
-    const skillsAutocomplete = skills.map((i) => {
-      return {
-        id: i._source.id,
-        name: i._source.name
-      }
-    })
-
-    this.setState({skillsAutocomplete: skillsAutocomplete})
+    this.setState({skillsAutocomplete: skills})
   }
 
   selectSkill(skill) {
@@ -90,18 +83,18 @@ export default class extends React.Component {
 
   async updateProfessionsAutocomplete(value) {
     this.setState({professionsAutocompleteValue: value})
-    const exclude = this.state.professionsSelected.join()
-    const response = await fetch(`${searchApiUrl}/professions?name=${value}&exclude=${exclude}`)
+    const exclude = this.state.professionsSelected
+    const response = await fetch(`${searchApiUrl}/professions`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: value, exclude: exclude })
+    })
     const professions = (await response.json()).professions
 
-    const professionsAutocomplete = professions.map((i) => {
-      return {
-        id: i._source.id,
-        name: i._source.name
-      }
-    })
-
-    this.setState({professionsAutocomplete: professionsAutocomplete})
+    this.setState({professionsAutocomplete: professions})
   }
 
   selectProfession(profession) {
