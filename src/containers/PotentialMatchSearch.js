@@ -44,8 +44,15 @@ export default class extends React.Component {
 
   async updateSkillsAutocomplete(value) {
     this.setState({skillsAutocompleteValue: value})
-    const exclude = this.state.skillsSelected.join()
-    const response = await fetch(`${searchApiUrl}/skills?name=${value}&exclude=${exclude}`)
+    const exclude = this.state.skillsSelected
+    const response = await fetch(`${searchApiUrl}/skills`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: value, exclude: exclude })
+    })
     const skills = (await response.json()).skills
 
     const skillsAutocomplete = skills.map((i) => {
