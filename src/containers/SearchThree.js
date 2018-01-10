@@ -146,7 +146,7 @@ export default class extends React.Component {
     const response = await fetch(`${searchApiUrl}/users3?page=${this.state.currentPage}`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json, text/plain, */*',
+        'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
@@ -171,7 +171,7 @@ export default class extends React.Component {
     const response = await fetch(`${searchApiUrl}/skills/related`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json, text/plain, */*',
+        'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
