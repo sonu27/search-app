@@ -19,7 +19,11 @@ export default class extends React.Component {
       professionsAutocomplete: [],
       professionsAutocompleteValue: '',
       professionsSelected: [],
+      locationsAutocomplete: [],
+      locationsAutocompleteValue: '',
+      locationsSelected: [],
       levelsSelected: [],
+      availabilitiesSelected: [],
       aggregations: {
         skills: [],
         professions: [],
@@ -102,6 +106,39 @@ export default class extends React.Component {
     }, this.updateResults)
   }
 
+  async updateLocationsAutocomplete(value) {
+    this.setState({ locationsAutocompleteValue: value })
+    const exclude = this.state.locationsSelected
+    const locations = await new Api().searchLocations(value, exclude)
+
+    const locationsAutocomplete = locations.map((i) => ({ name: i.name }))
+
+    this.setState({ locationsAutocompleteValue: value, locationsAutocomplete: locationsAutocomplete })
+  }
+
+  selectLocation(location) {
+    this.setState({
+      locationsAutocompleteValue: '',
+      locationsAutocomplete: [],
+    }, this.addLocation(location))
+  }
+
+  addLocation(location) {
+    if (!this.state.locationsSelected.includes(location)) {
+      this.setState({
+        locationsSelected: this.state.locationsSelected.concat(location),
+        currentPage: 1,
+      }, this.updateResults)
+    }
+  }
+
+  removeLocation(location) {
+    this.setState({
+      locationsSelected: this.state.locationsSelected.filter((i) => i !== location),
+      currentPage: 1,
+    }, this.updateResults)
+  }
+
   handleLevelChange(e) {
     const target = e.target
     const level = target.value
@@ -118,11 +155,29 @@ export default class extends React.Component {
     }
   }
 
+  handleAvailabilityChange(e) {
+    const target = e.target
+    const availability = target.value
+    if (target.checked) {
+      this.setState({
+        availabilitiesSelected: this.state.availabilitiesSelected.concat(availability),
+        currentPage: 1,
+      }, this.updateResults)
+    } else {
+      this.setState({
+        availabilitiesSelected: this.state.availabilitiesSelected.filter((i) => i !== availability),
+        currentPage: 1,
+      }, this.updateResults)
+    }
+  }
+
   async updateResults() {
     const data = {
       skills: this.state.skillsSelected,
       professions: this.state.professionsSelected,
       levels: this.state.levelsSelected,
+      locations: this.state.locationsSelected,
+      availabilities: this.state.availabilitiesSelected,
     }
     const response = await new Api().postRequest(`${searchApiUrl}/users3?page=${this.state.currentPage}`, data)
 
@@ -206,6 +261,16 @@ export default class extends React.Component {
       }
     )
 
+    const locationsSelected = this.state.locationsSelected.map(
+      i => {
+        return (
+          <div key={i}>
+            <a className='ui label'>{i}<i onClick={e => this.removeLocation(i)} className='delete icon'/></a><br/>
+          </div>
+        )
+      }
+    )
+
     // const locationsAgg = this.state.aggregations.locations.map(
     //   i => {
     //     return (
@@ -223,6 +288,18 @@ export default class extends React.Component {
         <div key={i}>
           <label>
             <input type='checkbox' value={i} onChange={this.handleLevelChange.bind(this)}/> {v}
+          </label>
+        </div>
+      )
+    })
+
+    const allAvailabilities = ['availableForFullTime', 'availableForFreelance', 'availableForInternships']
+
+    const availabilities = allAvailabilities.map((v, i) => {
+      return (
+        <div key={i}>
+          <label>
+            <input type='checkbox' value={v} onChange={this.handleAvailabilityChange.bind(this)}/> {v}
           </label>
         </div>
       )
@@ -266,8 +343,27 @@ export default class extends React.Component {
 
           <hr/>
 
+          <h3>Locations</h3>
+          <Autocomplete
+            getItemValue={item => item.name}
+            items={this.state.locationsAutocomplete}
+            renderItem={this.renderAutocompleteItem}
+            value={this.state.locationsAutocompleteValue}
+            onChange={e => this.updateLocationsAutocomplete(e.target.value)}
+            onSelect={(v) => this.selectLocation(v)}
+          />
+          {locationsSelected}
+
+          <hr/>
+
           <h3>Levels</h3>
           {levels}
+
+          <hr/>
+
+          <h3>Availability</h3>
+          {availabilities}
+
         </div>
 
         <div className='ten wide column'>
