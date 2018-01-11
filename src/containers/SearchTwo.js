@@ -45,7 +45,8 @@ export default class extends React.Component {
   addProfession(id) {
     const professionsSelected = this.state.professionsSelected
     this.setState({
-      professionsSelected: professionsSelected.concat([id])
+      professionsSelected: professionsSelected.concat([id]),
+      value: '',
     }, this.updateResults)
   }
 
@@ -113,6 +114,7 @@ export default class extends React.Component {
         </div>
 
         <div className='ten wide column'>
+          <p>With this search you can free-text search professions, select a profession and it shows related professions.</p>
           <h3>Results</h3>
           <div className='ui divided items'>
             {results}

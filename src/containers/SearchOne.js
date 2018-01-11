@@ -114,6 +114,7 @@ export default class extends React.Component {
         </div>
 
         <div className='ten wide column'>
+          <p>Using the profession(s) you provided this search finds other related professions using a graph database, adds a relevance to these and queries Elasticsearch with all this data.</p>
           <h3>Results</h3>
           <div className='ui divided items'>
             {results}
