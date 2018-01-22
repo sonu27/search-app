@@ -25,7 +25,7 @@ export default ({user}) => (
   <div className='item'>
     <a className='ui tiny image'><img src={getProfileImageUrl(user)} alt=''/></a>
     <div className='content'>
-      <a className='header' href={`https://the-dots.com/users/${user.id}`}>{user.firstName} {user.lastName}</a> - ({user.score})
+      <a className='header' href={`https://the-dots.com/users/${user.id}`}>{user.firstName} {user.lastName}</a> - ({user.score}) - SS: {user.searchScore}
       <div className='meta'>
         <span>{user.tagline}</span>
       </div>
