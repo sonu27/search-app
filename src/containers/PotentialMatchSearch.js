@@ -324,8 +324,8 @@ export default class extends React.Component {
 
           <hr/>
 
-          <h3>Availability</h3>
-          {availabilities}
+          {/* <h3>Availability</h3>
+          {availabilities} */}
 
         </div>
 
