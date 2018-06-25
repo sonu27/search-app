@@ -1,16 +1,22 @@
 import React from 'react'
 import Autocomplete from 'react-autocomplete'
+import algoliasearch from 'algoliasearch'
 import Api from '../api'
+import Algolia from '../apiAlgolia'
 import Pagination from '../components/Pagination'
-import UserResult from '../components/UserResult'
+import UserResult from '../components/AlgUserResult2'
 
 const searchApiUrl = process.env.REACT_APP_SEARCH_API_URL
+
+const client = algoliasearch('ZWTZSDMEVX', '2f0ab57f6a87e5631ce4daa1c9184ddf')
+const index = client.initIndex('test_amarjeet2');
 
 export default class extends React.Component {
   constructor(props) {
     super(props)
 
     this.state = {
+      professions: [],
       results: [],
       totalResults: 0,
       skillsAutocomplete: [],
@@ -24,6 +30,11 @@ export default class extends React.Component {
       locationsSelected: [],
       levelsSelected: [],
       availabilitiesSelected: [],
+      aggregations: {
+        skills: [],
+        professions: [],
+        locations: [],
+      },
       relatedSkills: [],
       currentPage: 1,
     }
@@ -44,9 +55,9 @@ export default class extends React.Component {
   async updateSkillsAutocomplete(value) {
     this.setState({ skillsAutocompleteValue: value })
     const exclude = this.state.skillsSelected
-    const skills = await new Api().searchSkills(value, exclude)
+    const skills = await new Algolia().searchSkills(value, exclude)
 
-    this.setState({ skillsAutocomplete: [{ id: 1, name: value}].concat(skills) })
+    this.setState({ skillsAutocomplete: skills })
   }
 
   selectSkill(skill) {
@@ -75,16 +86,16 @@ export default class extends React.Component {
   async updateProfessionsAutocomplete(value) {
     this.setState({ professionsAutocompleteValue: value })
     const exclude = this.state.professionsSelected
-    const professions = await new Api().searchProfessions(value, exclude)
+    const professions = await new Algolia().searchProfessions(value, exclude)
 
-    this.setState({ professionsAutocomplete: [{ id: 1, name: value}].concat(professions) })
+    this.setState({ professionsAutocomplete: professions })
   }
 
-  selectProfession(profession) {
+  selectProfession(profession, object) {
     this.setState({
       professionsAutocompleteValue: '',
       professionsAutocomplete: [],
-    }, this.addProfession(profession))
+    }, this.addProfession(object))
   }
 
   addProfession(profession) {
@@ -98,7 +109,7 @@ export default class extends React.Component {
 
   removeProfession(profession) {
     this.setState({
-      professionsSelected: this.state.professionsSelected.filter((i) => i !== profession),
+      professionsSelected: this.state.professionsSelected.filter((i) => i.name !== profession),
       currentPage: 1,
     }, this.updateResults)
   }
@@ -106,11 +117,9 @@ export default class extends React.Component {
   async updateLocationsAutocomplete(value) {
     this.setState({ locationsAutocompleteValue: value })
     const exclude = this.state.locationsSelected
-    const locations = await new Api().searchLocations(value, exclude)
+    const locations = await new Algolia().searchLocations(value, exclude)
 
-    const locationsAutocomplete = locations.map((i) => ({ name: i.name }))
-
-    this.setState({ locationsAutocomplete: locationsAutocomplete })
+    this.setState({ locationsAutocomplete: locations })
   }
 
   selectLocation(location) {
@@ -169,18 +178,26 @@ export default class extends React.Component {
   }
 
   async updateResults() {
+    const professions = this.state.professionsSelected.map((v) => `professions:${v.name}`)
+    const skills = this.state.skillsSelected.map((v) => `skills:${v}`)
+    const levels = this.state.levelsSelected.map((v) => `level:${v}`)
+    const locations = this.state.locationsSelected.map((v) => `locationName:${v}`)
+    const professionCounterparts = this.state.professionsSelected.map((v) => `professionCounterparts:"${v.counterparts.join('')}"`).join(' OR ')
+
     const data = {
-      skills: this.state.skillsSelected,
-      professions: this.state.professionsSelected,
-      levels: this.state.levelsSelected,
-      locations: this.state.locationsSelected,
-      availabilities: this.state.availabilitiesSelected,
+      page: this.state.currentPage - 1,
+      filters: professionCounterparts,
+      optionalFilters: professions.concat(skills).concat(levels).concat(locations)
     }
-    const response = await new Api().postRequest(`${searchApiUrl}/users4?page=${this.state.currentPage}`, data)
+
+    console.log(data)
+
+    const response = await index.search(data)
 
     this.setState({
-      results: response.users,
-      totalResults: response.total,
+      results: response.hits,
+      totalResults: response.nbHits,
+      // aggregations: response.aggregations,
     }, this.updateRelated)
   }
 
@@ -227,11 +244,31 @@ export default class extends React.Component {
       }
     )
 
-    const professionsSelected = this.state.professionsSelected.map(
+    const skillsAgg = this.state.aggregations.skills.map(
       i => {
         return (
           <div key={i}>
-            <a className='ui label'>{i}<i onClick={e => this.removeProfession(i)} className='delete icon'/></a><br/>
+            <a className='ui label'><i onClick={e => this.addSkill(i)} className='add icon'/>{i}</a>
+          </div>
+        )
+      }
+    )
+
+    const professionsSelected = this.state.professionsSelected.map(
+      i => {
+        return (
+          <div key={i.name}>
+            <a className='ui label'>{i.name}<i onClick={e => this.removeProfession(i.name)} className='delete icon'/></a><br/>
+          </div>
+        )
+      }
+    )
+
+    const professionsAgg = this.state.aggregations.professions.map(
+      i => {
+        return (
+          <div key={i}>
+            <a className='ui label'><i onClick={e => this.addProfession(i)} className='add icon'/>{i}</a>
           </div>
         )
       }
@@ -288,6 +325,7 @@ export default class extends React.Component {
             onSelect={(v) => this.selectSkill(v)}
           />
           {skillsSelected}
+          {skillsAgg}
 
           <h4>Related Skills</h4>
           {relatedSkills}
@@ -301,9 +339,10 @@ export default class extends React.Component {
             renderItem={this.renderAutocompleteItem}
             value={this.state.professionsAutocompleteValue}
             onChange={e => this.updateProfessionsAutocomplete(e.target.value)}
-            onSelect={(v) => this.selectProfession(v)}
+            onSelect={(v, o) => this.selectProfession(v, o)}
           />
           {professionsSelected}
+          {professionsAgg}
 
           <hr/>
 
@@ -323,9 +362,9 @@ export default class extends React.Component {
           <h3>Levels</h3>
           {levels}
 
-          <hr/>
+          {/* <hr/>
 
-          {/* <h3>Availability</h3>
+          <h3>Availability</h3>
           {availabilities} */}
 
         </div>
